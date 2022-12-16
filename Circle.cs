@@ -2,21 +2,36 @@ using System;
 
 namespace Day6
 {
-    class Cicle
+    class BaseCircle
     {
-        int _raduis;
+        double _pi = 3.14159265359;
 
-        public int Raduis
+        public BaseCircle(int raduis) => Raduis = raduis;
+
+        public int Raduis {get; set;}
+
+        public double PI {get => _pi;}
+
+        public int GetSize() => (int) PI * (Raduis * Raduis);
+
+        public static int[] CalaArray(int[] data)
         {
-            get => _raduis;
-            set => _raduis = value;
+            int[] arr = new int[data.Length];
+            for (int i = 0; i < data.Length; i++)
+            {
+                arr[i] = new BaseCircle(data[i]).GetSize();
+            }
+            return arr;
         }
 
-        public double Calc()
+        public static int GetSize(int[] data)
         {
-            double pi = 3.14159;
-            double area = pi * Raduis * Raduis;
-            return area;
+            int res = 0;
+            for (int i = 0; i < data.Length; i++)
+            {
+                res += data[i];
+            }
+            return res;
         }
     }
 }

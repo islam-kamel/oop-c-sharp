@@ -2,73 +2,127 @@ using System;
 
 namespace Day6
 {
-    class Picture
+    class BasePicture
     {
-        Squre _squre;
-        Squre[] _sqList = new Squre[0];
+        int[] _array_of_circle;
+        BaseSquare[] _array_of_square;
+        BaseSquare _square;
 
-        public Picture(){}
-        public Picture(Squre s)
+        public BaseRectangle Rect {get; set;}
+
+        public BaseRectangle[] ArrayOfRect {get; set;}
+
+        public BaseSquare Square
         {
-            Sq = s;
+            get => BaseSquare.DeepCopy(_square);
+
+            set => _square= BaseSquare.DeepCopy(value);
         }
 
-        public Picture(Squre[] s)
+        public BaseSquare[] ArraySqr
         {
-            SqList = s;
+            get => BaseSquare.DeepCopy(_array_of_square);
+            set => _array_of_square = BaseSquare.DeepCopy(value);
         }
 
-        public Squre Sq
+        public int Circle(int raduis) => new BaseCircle(raduis).GetSize();
+
+        public int[] ArrayOfCircle
         {
-            get => new Squre(_squre);
-            set => _squre = new Squre(value);
+            get => _array_of_circle;
+            set => _array_of_circle = BaseCircle.CalaArray(value);
         }
 
-        public Squre[] SqList
+        public int GetPicSize()
         {
-            get => _sqList;
-            set
-            {
-                _sqList = new Squre[value.Length];
-                for (int i = 0; i < value.Length; i++)
-                {
-                    _sqList[i] = value[i];
-                }
-            }
-        }
+            int res = 0;
 
-        public Rectangle r {get; set;}
-
-        public double c(Cicle a)
-        {
-            return a.Calc();
-        }
-
-        public int CalcRectangel()
-        {
             try
             {
-                return (r.Width + r.Hight) * 2;
+                res += BaseSquare.GetSize(ArraySqr);
+                res += BaseSquare.GetSize(Square);
+                res += BaseRectangle.GetSize(ArrayOfRect);
+                res += BaseCircle.GetSize(ArrayOfCircle);
+                res += Rect.GetSize();
+                return res;
             }
-            catch (NullReferenceException)
-            {
-                return 0;
-            }
+            catch (NullReferenceException) {return res;}
+
         }
 
-        public void Display()
+        public static BaseSquare[] ToSquareArray(int[] data) => BaseSquare.ToSquareArray(data);
+
+        public BasePicture() {}
+
+        public BasePicture(int dim)
         {
-            Squre[] s = SqList;
-            if (s.Length > 0)
-            {
-                for (int i = 0; i < s.Length; i++)
-                {
-                    Console.WriteLine($"Size of Picture {i+1} is: {s[i].Calc() + CalcRectangel()}");
-                }
-                return;
-            }
-           Console.WriteLine($"Size of Picture is: {Sq.Calc() + CalcRectangel()}");
+            _square = new BaseSquare(dim);
         }
+
+        public BasePicture(BaseSquare s) : this(s.Dim) {}
+
+        public BasePicture(BaseSquare[] s) => ArraySqr = s;
+
+        public static implicit operator BasePicture (BaseSquare[] s) => new BasePicture(s);
 
     }
+
+
+
+
+    class Picture : BasePicture
+    {
+
+        public Picture()
+        {
+            Square = new BaseSquare(0);
+        }
+
+        public Picture(int dim)
+        {
+            Square = new BaseSquare(dim);
+            ArraySqr = new BaseSquare[1] {new BaseSquare()};
+        }
+
+        public Picture(BaseSquare s) : this(s.Dim) {}
+
+        public Picture(BaseSquare[] s) => ArraySqr = s;
+
+        public static implicit operator Picture (int[] data)
+        {
+            Picture pic = new Picture();
+            pic.ArraySqr = Picture.ToSquareArray(data);
+            return pic;
+        }
+
+        public static implicit operator Picture (int dim) => new Picture(dim);
+
+        public static implicit operator Picture (BaseSquare[] s) => new Picture(s);
+
+        public static Picture operator + (Picture pic, int dim)
+        {
+            pic.Square = new BaseSquare(pic.Square.Dim + dim);
+            return pic;
+        }
+
+        public static Picture operator + (Picture pic, int[] data)
+        {
+            pic.ArraySqr = Picture.ToSquareArray(data);
+            return pic;
+        }
+
+        public static Picture operator + (Picture pic, int[,] data)
+        {
+            BaseRectangle[] rec = new BaseRectangle[data.GetLength(0)];
+            for (int i = 0; i < data.GetLength(0); i++)
+            {
+                rec[i] = new BaseRectangle();
+                rec[i].Width = data[i, 0];
+                rec[i].Higth = data[i, 1];
+            }
+            pic.ArrayOfRect = rec;
+            return pic;
+        }
+    }
 }
+

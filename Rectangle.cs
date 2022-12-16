@@ -2,32 +2,33 @@ using System;
 
 namespace Day6
 {
-    class Rectangle
+    class BaseRectangle
     {
-        int _width;
-        int _hight;
+        public int Width {get; set;}
 
-        public Rectangle(int w, int h)
+        public int Higth {get; set;}
+
+        public int GetSize() => Width * Higth;
+
+        public static int GetSize(BaseRectangle[] r)
+        {
+            int res = 0;
+            for (int i = 0; i < r.Length; i++)
+            {
+                res += r[i].GetSize();
+            }
+           return res;
+        }
+
+        public BaseRectangle() {}
+
+        public BaseRectangle(BaseRectangle r) : this(r.Width, r.Higth) {}
+
+        public BaseRectangle(int w, int h)
         {
             Width = w;
-            Hight = h;
+            Higth = h;
         }
 
-        public int Width
-        {
-            get => _width;
-            set => _width = value;
-        }
-
-        public int Hight
-        {
-            get => _hight;
-            set => _hight = value;
-        }
-
-        public int Calc()
-        {
-            return (Width * 2) + (Hight * 2);
-        }
     }
 }
